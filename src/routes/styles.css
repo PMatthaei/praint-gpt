@@ -102,3 +102,12 @@ button:focus:not(:focus-visible) {
 .ce-block__content{
 	max-width: 100%;
 }
+
+::-webkit-scrollbar {
+	background-color: #202324;
+	color: #aba499;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: #454a4d;
+}
