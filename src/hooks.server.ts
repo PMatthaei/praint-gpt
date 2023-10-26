@@ -1,14 +1,12 @@
 import {SvelteKitAuth} from "@auth/sveltekit"
 import Google from "@auth/core/providers/google";
-import {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET} from "$env/static/private";
-import type {User} from "@auth/core/types";
-import type {GoogleProfile} from "@auth/core/providers/google";
+import {env} from "$env/dynamic/private";
 
 export const handle = SvelteKitAuth({
     providers: [
         Google({
-            clientId: GOOGLE_CLIENT_ID,
-            clientSecret:  GOOGLE_CLIENT_SECRET,
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret:  env.GOOGLE_CLIENT_SECRET,
             authorization: {
                 params: {
                     prompt: "consent",
