@@ -4,6 +4,7 @@
     import './styles.css';
     import logo from '$lib/images/svelte-logo.svg';
     import {page} from "$app/stores";
+    import {signIn, signOut} from '@auth/sveltekit/client'
 
     let editor
 
@@ -15,13 +16,10 @@
             placeholder: 'Type something...',
             data: {
                 time: Date.now(),
-                blocks: [
-
-                ],
+                blocks: [],
                 version: "2.12.4",
             },
-            tools: {
-            },
+            tools: {},
         })
         try {
             await editor.isReady;
@@ -52,7 +50,7 @@
         <ul class="space-y-2 font-medium">
             <li>
                 <a
-                   class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white group">
+                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white group">
                     <img class="h-10 w-auto" src="{logo}" alt="Sveltekit - Prain">
                     <span class="ml-4 text-2xl font-bold">Prain</span>
                 </a>
@@ -80,12 +78,22 @@
                 </a>
             </li>
 
+            <li>
+                {#if $page.data.session?.user}
+                    <p>Signed in as {$page.data.session.user.email}</p>
+                    <img src="{$page.data.session.user.image}">
+                    <button on:click={signOut}>Sign out</button>
+                {:else}
+                    <p>Not signed in.</p>
+                    <button on:click={() => signIn('google')}>Sign in</button>
+                {/if}
+            </li>
         </ul>
     </div>
 </aside>
 
 <main>
-    <slot />
+    <slot/>
 </main>
 
 <style>
