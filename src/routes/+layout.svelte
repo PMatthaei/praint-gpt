@@ -1,34 +1,10 @@
 <script>
-    import {onMount} from 'svelte';
     import "../app.css";
     import './styles.css';
     import logo from '$lib/images/svelte-logo.svg';
     import {page} from "$app/stores";
-    import {signIn, signOut} from '@auth/sveltekit/client'
+    import { signOut} from '@auth/sveltekit/client'
 
-    let editor
-
-    onMount(async () => {
-        const editorjs = await import ('@editorjs/editorjs');
-        const EditorJs = editorjs.default;
-        editor = new EditorJs({
-            holder: 'editorjs',
-            placeholder: 'Type something...',
-            data: {
-                time: Date.now(),
-                blocks: [],
-                version: "2.12.4",
-            },
-            tools: {},
-        })
-        try {
-            await editor.isReady;
-            console.log('Editor.js is ready to work!')
-            /** Do anything you need after editor initialization */
-        } catch (reason) {
-            console.log(`Editor.js initialization failed because of ${reason}`)
-        }
-    })
 </script>
 
 
