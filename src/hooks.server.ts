@@ -3,9 +3,8 @@ import Google from "@auth/core/providers/google";
 import {env} from "$env/dynamic/private";
 
 export const handle = SvelteKitAuth({
-    // TODO https://authjs.dev/reference/core/errors/#untrustedhost
-    trustHost: true, // Fix: https://github.com/nextauthjs/next-auth/discussions/6071
-    secret: "werwerwer",
+    secret: env.AUTH_SECRET,
+    trustHost: true,
     providers: [
         Google({
             clientId: env.GOOGLE_CLIENT_ID,
