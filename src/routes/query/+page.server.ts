@@ -1,11 +1,12 @@
 import type {Actions} from "@sveltejs/kit";
 
 export const actions: Actions = {
-    connect: async ({cookies, request}) => {
+    query: async ({cookies, request}) => {
         const data = await request.formData();
+        const message = data.get("message")
         const res = await fetch('https://httpbin.org/post', {
             method: 'POST',
-            body: data.get("json")
+            body: message
         })
 
         const json = await res.json()

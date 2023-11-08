@@ -8,7 +8,7 @@ export const handle = SvelteKitAuth({
     providers: [
         Google({
             clientId: env.GOOGLE_CLIENT_ID,
-            clientSecret:  env.GOOGLE_CLIENT_SECRET,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
             authorization: {
                 params: {
                     prompt: "consent",

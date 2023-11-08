@@ -1,26 +1,24 @@
-<script>
+<script lang="ts">
     import "../app.css";
     import './styles.css';
     import logo from '$lib/images/svelte-logo.svg';
     import {page} from "$app/stores";
-    import { signOut} from '@auth/sveltekit/client'
-
+    import {signOut} from '@auth/sveltekit/client'
 </script>
 
-
-<button data-drawer-target="default-sidebar" data-drawer-toggle="default-sidebar" aria-controls="default-sidebar"
-        type="button"
-        class="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+<button aria-controls="default-sidebar" class="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" data-drawer-target="default-sidebar"
+        data-drawer-toggle="default-sidebar"
+        type="button">
     <span class="sr-only">Open sidebar</span>
-    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-        <path clip-rule="evenodd" fill-rule="evenodd"
-              d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
+    <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path clip-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
+              fill-rule="evenodd"></path>
     </svg>
 </button>
 
-<aside id="default-sidebar"
+<aside aria-label="Sidebar"
        class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
-       aria-label="Sidebar">
+       id="default-sidebar">
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
         <ul class="space-y-2 font-medium">
             <li>
@@ -40,11 +38,14 @@
             </li>
             <li>
                 {#if $page.data.session?.user}
-                    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    <button type="button"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             on:click={signOut}>
                         Sign out
-                        <svg class="w-5 h-5 ml-2 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 15">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 7.5h11m0 0L8 3.786M12 7.5l-4 3.714M12 1h3c.53 0 1.04.196 1.414.544.375.348.586.82.586 1.313v9.286c0 .492-.21.965-.586 1.313A2.081 2.081 0 0 1 15 14h-3"/>
+                        <svg class="w-5 h-5 ml-2 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 18 15">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M1 7.5h11m0 0L8 3.786M12 7.5l-4 3.714M12 1h3c.53 0 1.04.196 1.414.544.375.348.586.82.586 1.313v9.286c0 .492-.21.965-.586 1.313A2.081 2.081 0 0 1 15 14h-3"/>
                         </svg>
                     </button>
                 {/if}
@@ -52,27 +53,27 @@
 
             <li>
                 <div class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white group">
-                    <img class="h-10 w-auto" src="{logo}" alt="Sveltekit - Prain">
+                    <img alt="Sveltekit - Prain" class="h-10 w-auto" src="{logo}">
                     <span class="ml-4 text-2xl font-bold">Prain</span>
                 </div>
             </li>
             <li>
-                <a href="/connect" aria-current={$page.url.pathname === '/connect' ? 'page' : undefined}
-                   class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
-                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 1v16M1 9h16"/>
+                <a aria-current={$page.url.pathname === '/connect' ? 'page' : undefined} class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                   href="/connect">
+                    <svg aria-hidden="true" class="w-5 h-5 text-gray-800 dark:text-white"
+                         fill="none" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 1v16M1 9h16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                              stroke-width="2"/>
                     </svg>
                     <span class="ml-3">Build Braincell</span>
                 </a>
             </li>
 
             <li>
-                <a href="/query" aria-current={$page.url.pathname === '/query' ? 'page' : undefined}
-                   class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
-                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <a aria-current={$page.url.pathname === '/query' ? 'page' : undefined} class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                   href="/query">
+                    <svg aria-hidden="true" class="w-5 h-5 text-gray-800 dark:text-white"
+                         fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z"/>
                     </svg>
                     <span class="ml-3">Query Braincell</span>
