@@ -1,11 +1,16 @@
 <script lang="ts">
     import {onMount} from "svelte";
+    import type {ActionData} from "../../../.svelte-kit/types/src/routes/connect/$types";
+    import {applyAction, enhance} from "$app/forms"
+    import {goto} from "$app/navigation";
 
     let editor = null
 
     let file = null
     let jsonString = null
     let jsonObject = null
+
+    export let form: ActionData;
 
     onMount(async () => {
         const editorjs = await import ('@editorjs/editorjs');
@@ -43,7 +48,18 @@
     <meta content="Connect a Braincell" name="description"/>
 </svelte:head>
 
-<form action="?/connect" class="flex flex-col gap-4 h-screen p-4 sm:ml-64" enctype="multipart/form-data" method="POST">
+<form action="?/connect" class="flex flex-col gap-4 h-screen p-4 sm:ml-64"
+      use:enhance={({ formElement, formData, action, cancel }) => {
+		return async ({ result }) => {
+			editor.blocks.clear()
+			if (result.type === 'redirect') {
+				goto(result.location);
+			} else {
+				await applyAction(result);
+			}
+		};
+	}}
+      enctype="multipart/form-data" method="POST">
     <div class="flex items-center justify-center w-full">
         <label class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
                for="dropzone-file">
@@ -67,6 +83,10 @@
     <div class="flex flex-col grow w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <div class="grow w-full" id="editorjs"></div>
         <input bind:value={jsonString} class="hidden" id="editor-json" name="json" required type="text"/>
+
+        {#if form?.success}
+            <p>Successfully connected.</p>
+        {/if}
 
         <div class="flex flex-row justify-center">
             <button class={

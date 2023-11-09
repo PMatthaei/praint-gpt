@@ -11,6 +11,7 @@ export const actions: Actions = {
         const json = await res.json()
         const result = JSON.stringify(json)
         debugger
+        return {success:true}
         // TODO save data to database
     },
 };
