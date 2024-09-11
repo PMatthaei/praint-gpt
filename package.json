@@ -1,4 +1,7 @@
 {
+	"engines": {
+		"node": "20.11.1"
+	},
 	"name": "prain-gpt",
 	"version": "0.0.1",
 	"scripts": {
