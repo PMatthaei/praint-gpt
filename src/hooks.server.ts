@@ -1,9 +1,8 @@
 import {SvelteKitAuth} from "@auth/sveltekit"
 import Google from "@auth/core/providers/google";
 import {env} from "$env/dynamic/private";
-import type {Handle} from "@sveltejs/kit";
 
-export const handle:Handle = SvelteKitAuth({
+export const { handle, signIn, signOut } = SvelteKitAuth({
     secret: env.AUTH_SECRET,
     trustHost: true,
     providers: [
