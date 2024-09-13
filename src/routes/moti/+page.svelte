@@ -1,20 +1,30 @@
 <script lang="ts">
     import * as Tone from "tone";
     import {onDestroy, onMount} from "svelte";
-    import {io} from 'socket.io-client'
+    import {Visualizer} from "./visualizer/visualizer";
 
-    Tone.start()
-    const synth = new Tone.Synth().toDestination();
-    const analyser = new Tone.Analyser("waveform", 256);
-    synth.connect(analyser);
+    let synth: Tone.Synth
+    const visualizer = new Visualizer()
 
-    const socket = io()
-
-    let canvas;
-    let canvasCtx;
     let isMuted = false;
+    let eventSource: EventSource;
 
-    function playNote(frequency, duration) {
+    function start() {
+        Tone.start()
+        synth = new Tone.Synth().toDestination();
+        const analyser = new Tone.Analyser("waveform", 256);
+        synth.connect(analyser);
+        visualizer.init(analyser)
+        visualizer.start()
+
+        eventSource.onmessage = (message) => {
+            const {frequency, duration}: Note = JSON.parse(message.data)
+            playNote(frequency, duration)
+        };
+
+    }
+
+    function playNote(frequency: number, duration: number) {
         console.log("Playing: ", frequency, duration)
         synth.triggerAttackRelease(frequency, duration);
     }
@@ -24,67 +34,25 @@
         Tone.getDestination().mute = isMuted;
     }
 
-    function drawWaveform() {
-        requestAnimationFrame(drawWaveform);
-
-        // Get the waveform data from the analyser
-        const waveformData = analyser.getValue();
-        const WIDTH = canvas.width;
-        const HEIGHT = canvas.height;
-
-        // Clear the canvas for each new frame
-        canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-
-        canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'lime';
-
-        canvasCtx.beginPath();
-
-        const sliceWidth = WIDTH / waveformData.length;
-        let x = 0;
-
-        // Smooth curve drawing
-        for (let i = 0; i < waveformData.length - 1; i++) {
-            const v1 = (waveformData[i] + 1) / 2;
-            const y1 = v1 * HEIGHT;
-
-            const v2 = (waveformData[i + 1] + 1) / 2;
-            const y2 = v2 * HEIGHT;
-
-            const xMid = x + sliceWidth / 2;
-            const yMid = (y1 + y2) / 2;
-
-            if (i === 0) {
-                canvasCtx.moveTo(x, y1);
-            } else {
-                // Draw a smooth curve from the current point to the next
-                canvasCtx.quadraticCurveTo(x, y1, xMid, yMid);
-            }
-
-            x += sliceWidth;
-        }
-
-        // Complete the curve
-        canvasCtx.lineTo(WIDTH, HEIGHT / 2);
-        canvasCtx.stroke();
-    }
-
     onMount(() => {
-        canvas = document.getElementById('visualizer');
-        canvasCtx = canvas.getContext('2d');
+        eventSource = new EventSource('/moti');
 
-        socket.on('note', (message) => {
-            const {frequency, duration} = JSON.parse(message)
-            playNote(frequency, duration)
-        })
-
-        drawWaveform();
+        eventSource.onerror = () => {
+            console.error('Error in EventSource connection');
+            eventSource.close();
+        };
 
     });
 
     onDestroy(() => {
-        Tone.disconnect(synth)
+        if (synth) {
+            synth.disconnect();
+        }
+        if(eventSource){
+            eventSource.close();
+        }
     });
+
 </script>
 
 <style>
@@ -114,9 +82,10 @@
         <button class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
             Nature
         </button>
-        </div>
+    </div>
 
     <button on:click={toggleMute}>{isMuted ? 'Unmute' : 'Mute'}</button>
+    <button on:click={start}>Play</button>
     <canvas id="visualizer" width="800" height="300"></canvas>
 
 </div>
