@@ -1,3 +1,5 @@
+const encoder = new TextEncoder();
+
 export const GET = async () => {
     let intervalTimeout: NodeJS.Timeout;
 
@@ -8,12 +10,13 @@ export const GET = async () => {
                 const frequency = Math.random() * 500 + 100; // Random frequency between 100 and 600 Hz
                 const duration = Math.random() * 500 + 100; //  between 100 and 600 millisecond duration
                 const noteData: Note = {frequency, duration};
-                controller.enqueue(`data: ${JSON.stringify(noteData)}\n\n`);
+                const data = `data: ${JSON.stringify(noteData)}\n\n`;
+                controller.enqueue(encoder.encode(data)); // Encode the string to Uint8Array
             }, 2000);
 
-            controller.close = () => {
-                clearInterval(intervalTimeout);
-            };
+        },
+        close() {
+            clearInterval(intervalTimeout);
         },
         cancel() {
             clearInterval(intervalTimeout);
