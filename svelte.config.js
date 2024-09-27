@@ -1,5 +1,5 @@
-import azure from 'svelte-adapter-azure-swa';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import adapter from '@sveltejs/adapter-node';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -9,7 +9,7 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: azure(),
+		adapter: adapter(),
 		prerender: {
 			origin: "http://localhost:4173",
 		},
