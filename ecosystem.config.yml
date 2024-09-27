@@ -3,7 +3,9 @@ apps:
       script: 'build/index.js'            # Path to the built app's entry point
       instances: 1                        # Number of instances to run
       exec_mode: 'fork'                # Enable cluster mode
-      env:                                # Environment variables
-          NODE_ENV: 'production'            # Set environment to production
+      node_args: '-r dotenv/config'
+      env_production:
+        NODE_ENV: "production"
+        PORT: "8080"
       env_development:                    # Environment for development
           NODE_ENV: 'development'
