@@ -38,10 +38,10 @@ jobs:
 
     steps:
       - name: 'Checkout GitHub repository'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Set up Node.js'
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -53,10 +53,10 @@ jobs:
           npm run test --if-present
 
       - name: 'Archive sveltekit app'
-        run: zip -r sveltekit_app.zip ./build ecosystem.config.yml
+        run: zip -r sveltekit_app.zip ./build ecosystem.config.cjs
 
       - name: 'Upload artifact for deployment job'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sveltekit-app
           path: ./sveltekit_app.zip
@@ -72,7 +72,7 @@ jobs:
 
     steps:
       - name: 'Download artifact from build job'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: sveltekit-app
 
@@ -81,7 +81,7 @@ jobs:
 
       - name: 'Deploy to Azure WebApp'
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'production'
