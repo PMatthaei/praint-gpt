@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: 'sveltekit-app',
+            name: 'prain-app',
             script: 'build/index.js', // Replace with the entry point of your SvelteKit app or server
             instances: 1,           // You can increase this for a clustered setup
             exec_mode: 'fork',      // You can change this to 'cluster' if needed
