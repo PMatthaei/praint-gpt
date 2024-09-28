@@ -1,4 +1,4 @@
-class ReadableStreamResponse{
+export class ReadableStreamResponse{
     
     static of(stream: ReadableStream){
         return new Response(stream, {

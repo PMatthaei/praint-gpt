@@ -1,3 +1,5 @@
+import {ReadableStreamResponse} from "../../model/http/readable-stream-response";
+
 const encoder = new TextEncoder();
 
 export const GET = async () => {

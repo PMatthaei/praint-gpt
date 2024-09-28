@@ -1,10 +1,10 @@
 <script lang="ts">
     import * as Tone from "tone";
     import {onDestroy, onMount} from "svelte";
-    import {Visualizer} from "./visualizer/visualizer";
+    import AudioMotionAnalyzer from 'audiomotion-analyzer';
 
     let synth: Tone.Synth
-    const visualizer = new Visualizer()
+    let audioMotion: AudioMotionAnalyzer
 
     let isMuted = false;
     let eventSource: EventSource;
@@ -12,10 +12,12 @@
     function start() {
         Tone.start()
         synth = new Tone.Synth().toDestination();
-        const analyser = new Tone.Analyser("waveform", 256);
-        synth.connect(analyser);
-        visualizer.init(analyser)
-        visualizer.start()
+
+        const container = document.getElementById('audio-motion-container')!!;
+        audioMotion = new AudioMotionAnalyzer(container, {
+            source: synth.output as AudioNode,
+            // set your preferred options here
+        });
 
         eventSource.onmessage = (message) => {
             const {frequency, duration}: Note = JSON.parse(message.data)
@@ -45,6 +47,10 @@
     });
 
     onDestroy(() => {
+        if(audioMotion){
+            audioMotion.destroy();
+        }
+
         if (synth) {
             synth.disconnect();
         }
@@ -56,11 +62,6 @@
 </script>
 
 <style>
-    canvas {
-        display: block;
-        margin: 20px auto;
-        background-color: black;
-    }
 </style>
 
 <svelte:head>
@@ -114,6 +115,6 @@
         </button>
     </div>
 
-    <canvas id="visualizer" width="800" height="300"></canvas>
+    <div id="audio-motion-container"></div>
 
 </div>
