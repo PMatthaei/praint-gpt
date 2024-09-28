@@ -3,6 +3,8 @@ name: Azure Static Web Apps CI/CD
 # Deactivated
 on:
   push:
+    branches:
+      - disabled
 #  push:
 #    branches:
 #      - main
