@@ -1,29 +1,35 @@
-# Use the official Node.js image
-FROM node:20 AS builder
+# Use the slim Node.js 20 image as a base
+FROM node:20.11.1-slim AS build
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy package.json and package-lock.json from the root directory
+COPY ../package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
-COPY . .
+# Copy the rest of the application code from the root directory
+COPY .. .
 
 # Build the SvelteKit app
 RUN npm run build
 
-# Use a lightweight web server to serve the built app
-FROM serve:latest
+# Use a lightweight server image for serving the app
+FROM node:20.11.1-slim AS runtime
 
-# Copy the build output to the server
-COPY --from=builder /app/build /usr/share/serve/public
+# Set the working directory
+WORKDIR /app
+
+# Copy only the build output from the previous stage
+COPY --from=build /app/build ./build
+
+# Install serve for static file serving
+RUN npm install -g serve
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 8080
 
-# Start the server
-CMD ["serve", "-s", "/usr/share/serve/public"]
+# Command to run the application
+CMD ["node", "build/index.js"]
