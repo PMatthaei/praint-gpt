@@ -1,7 +1,6 @@
 <script lang="ts">
     import "../app.css";
     import './styles.css';
-    import logo from '$lib/images/svelte-logo.svg';
     import {page} from "$app/stores";
     import {signOut} from '@auth/sveltekit/client'
 </script>
@@ -70,5 +69,4 @@
 </main>
 
 <style>
-
 </style>
