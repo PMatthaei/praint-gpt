@@ -15,7 +15,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3 # Updated to v2.2.0
 
       - name: Terraform Init
-        run: terraform -chdir=terraform init terraform
+        run: terraform -chdir=terraform init
 
       - name: Terraform Apply
         run: terraform -chdir=terraform apply -auto-approve
