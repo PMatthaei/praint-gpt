@@ -24,11 +24,5 @@ export const GET = async () => {
         }
     });
 
-    return new Response(stream, {
-        headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
-        }
-    });
+    return ReadableStreamResponse.of(stream);
 };
