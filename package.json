@@ -7,7 +7,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev",
-		"start:prod": "pm2 start ecosystem.config.cjs --env production --no-daemon",
+		"start:prod": "pm2 start ecosystem.config.js --env production --no-daemon",
 		"build": "vite build",
 		"build:dotenv": "node -r dotenv/config build",
 		"preview": "vite preview",
