@@ -3,7 +3,12 @@ import type {Session} from "@auth/core/types";
 import {env} from "$env/dynamic/private";
 
 export const guard = (session: Session | null): { session: Session | null } => {
-    if (session?.user?.email !== env.ALLOWED_EMAIL) {
+    const email = session?.user?.email;
+    if(email === null || email === undefined){
+        redirect(307, 'auth/signin');
+    }
+    const isAllowedUser = env.ALLOWED_EMAIL.split(",").includes(email);
+    if (!isAllowedUser) {
         redirect(307, 'auth/signin');
     }
     if (session == null) {
