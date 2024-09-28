@@ -76,7 +76,7 @@ jobs:
           name: sveltekit-app
 
       - name: 'Unzip the artifact'
-        run: unzip sveltekit-app.zip
+        run: unzip sveltekit-app.zip -d sveltekit-app
 
       - name: 'Deploy to Azure WebApp'
         id: deploy-to-webapp
