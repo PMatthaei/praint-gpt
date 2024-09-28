@@ -10,14 +10,7 @@
     let eventSource: EventSource;
 
     function start() {
-        Tone.start()
-        synth = new Tone.Synth().toDestination();
 
-        const container = document.getElementById('audio-motion-container')!!;
-        audioMotion = new AudioMotionAnalyzer(container, {
-            source: synth.output as AudioNode,
-            // set your preferred options here
-        });
 
         eventSource.onmessage = (message) => {
             const {frequency, duration}: Note = JSON.parse(message.data)
@@ -34,9 +27,23 @@
     function toggleMute() {
         isMuted = !isMuted;
         Tone.getDestination().mute = isMuted;
+        if(isMuted){
+            audioMotion.stop();
+            audioMotion.volume = 0;
+        } else {
+            audioMotion.start()
+        }
     }
 
     onMount(() => {
+        Tone.start()
+        synth = new Tone.Synth().toDestination();
+
+        const container = document.getElementById('audio-motion-container')!!;
+        audioMotion = new AudioMotionAnalyzer(container, {
+            source: synth.output as AudioNode
+        });
+
         eventSource = new EventSource('/moti');
 
         eventSource.onerror = () => {
