@@ -52,7 +52,7 @@ jobs:
           npm run test --if-present
 
       - name: 'Archive sveltekit app'
-        run: zip -r sveltekit-app.zip ./build ecosystem.config.cjs package.json package-lock.json ./node_modules
+        run: zip -r sveltekit-app.zip ./build ecosystem.config.cjs package.json
 
       - name: 'Upload artifact for deployment job'
         uses: actions/upload-artifact@v4
