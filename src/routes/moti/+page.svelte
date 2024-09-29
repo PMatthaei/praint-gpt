@@ -6,7 +6,7 @@
     import checkNotNull = Extensions.checkNotNull;
     import rngImage from '$lib/images/channel-cards/rng-card.png';
 
-    const channels: Channel[] = [
+    const channels: Channel[] = Array(10).fill(
         {
             label: "Random",
             description: "Welcome to Random Tunes! Enjoy a continuous stream of random notes, perfect for any mood or moment.",
@@ -19,7 +19,7 @@
                 textColorColorHover: "text-black"
             },
         }
-    ]
+    )
     let activeChannel: Channel | undefined
 
     let synth: Tone.Synth | undefined
@@ -175,15 +175,15 @@
                 </button>
             {/if}
         {:else}
-            <span>Please select a channel</span>
+            <h4>Start listening to one of the following channels</h4>
         {/if}
     </div>
 
-    <span>Channels: </span>
+    <h2 class="text-2xl">Channels ({channels.length}): </h2>
 
-    <div class="flex flex-row">
+    <div class="flex flex-row flex-wrap gap-6 justify-center overflow-auto">
         {#each channels as channel}
-            <div class="animate-fade-in max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <div class="animate-fade-in md:w-[calc(33%-1.5rem)] bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <img class="channel-card-img rounded-t-lg" src="{channel.img}" alt=""/>
                 <div class="p-5">
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
