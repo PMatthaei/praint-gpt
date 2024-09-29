@@ -2,15 +2,21 @@
     import * as Tone from "tone";
     import {onDestroy, onMount} from "svelte";
     import AudioMotionAnalyzer from 'audiomotion-analyzer';
+    import {Extensions} from "../../model/core/extensions";
+    import checkNotNull = Extensions.checkNotNull;
+    import rngImage from '$lib/images/channel-cards/rng-card.png';
 
     const channels: Channel[] = [
         {
             label: "Random",
+            description: "Welcome to Random Tunes! Enjoy a continuous stream of random notes, perfect for any mood or moment.",
+            img: rngImage,
             style: {
                 class: "random",
                 backgroundColor: "bg-blue-100",
                 backgroundColorHover: "hover:bg-blue-400",
-                textColor: "text-black"
+                textColor: "text-black",
+                textColorColorHover: "text-black"
             },
         }
     ]
@@ -56,14 +62,15 @@
         Tone.start()
         synth = new Tone.Synth().toDestination();
 
-        const container = document.getElementById('audio-motion-container')!!;
+        const container = checkNotNull(document.getElementById('audio-motion-container'));
         audioMotion = new AudioMotionAnalyzer(container, {
             source: synth.output as AudioNode,
             overlay: true,
             showBgColor: false,
             colorMode: 'gradient',
             showScaleX: false,
-            mode: 4
+            mode: 4,
+            roundBars: true
         });
 
         channels.forEach(channel => {
@@ -101,6 +108,11 @@
         border-radius: 25px;
         background-color: #f7f7f7;
     }
+    .channel-card-img {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+    }
 </style>
 
 <svelte:head>
@@ -109,16 +121,6 @@
 </svelte:head>
 
 <div class="flex flex-col gap-4 h-screen p-4 sm:ml-64">
-    <span>Channels: </span>
-
-    <div class="flex flex-row">
-        {#each channels as channel}
-            <button on:click={()=>setChannel(channel)}
-                    class="{`channel-${channel.style.class}`} {channel.style.backgroundColor} text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
-                {channel.label}
-            </button>
-        {/each}
-    </div>
 
     <div id="audio-motion-container" class="animate-fade-in"></div>
 
@@ -172,8 +174,36 @@
 
                 </button>
             {/if}
+        {:else}
+            <span>Please select a channel</span>
         {/if}
     </div>
 
+    <span>Channels: </span>
 
+    <div class="flex flex-row">
+        {#each channels as channel}
+            <div class="animate-fade-in max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                <img class="channel-card-img rounded-t-lg" src="{channel.img}" alt=""/>
+                <div class="p-5">
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                        {channel.label}
+                    </h5>
+                    <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                        {channel.description}
+                    </p>
+                    <button on:click={()=>setChannel(channel)}
+                            class="{`channel-${channel.style.class}`} {channel.style.textColor} {channel.style.backgroundColor} {channel.style.backgroundColorHover} {channel.style.backgroundColorHover}
+                             inline-flex items-center px-3 py-2 text-sm font-medium text-center rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:focus:ring-blue-800">
+                        Listen
+                        <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        {/each}
+    </div>
 </div>

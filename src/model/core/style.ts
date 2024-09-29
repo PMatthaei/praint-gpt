@@ -3,4 +3,6 @@ interface Style {
     backgroundColor?: string
     backgroundColorHover?: string
     textColor?: string
+    textColorColorHover?: string
+
 }
