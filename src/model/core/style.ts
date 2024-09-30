@@ -4,5 +4,4 @@ interface Style {
     backgroundColorHover?: string
     textColor?: string
     textColorColorHover?: string
-
 }

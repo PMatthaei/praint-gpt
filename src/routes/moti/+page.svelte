@@ -5,6 +5,7 @@
     import {Extensions} from "../../model/core/extensions";
     import checkNotNull = Extensions.checkNotNull;
     import rngImage from '$lib/images/channel-cards/rng-card.png';
+    import randomColor = Extensions.randomTailwindBackgroundColor;
 
     const channels: Channel[] = Array(10).fill(
         {
@@ -16,7 +17,7 @@
 
             style: {
                 class: "random",
-                backgroundColor: "bg-blue-100",
+                backgroundColor: "bg-pink-100",
                 backgroundColorHover: "hover:bg-blue-400",
                 textColor: "text-black",
                 textColorColorHover: "text-black"
@@ -24,7 +25,13 @@
         },
     ).map((item, index) => ({
         ...item,
-        uri: `${item.uri}-${index}`
+        label: `${item.label}-${index}`,
+        uri: `${item.uri}-${index}`,
+        style: {
+            ...item.style,
+            class: `${item.class}-${index}`,
+            backgroundColor: randomColor()
+        }
     }))
     let activeChannel: Channel | undefined
 
@@ -33,26 +40,33 @@
 
     let isMuted = false;
     let hasStarted = false;
-    let eventSource: EventSource | undefined;
+    let channelSource: EventSource | undefined;
 
-    const start = () => {
+    const startChannel = () => {
         hasStarted = true
 
-        eventSource?.close()
+        channelSource?.close()
         if(!activeChannel){
             throw new Error("No active channel.")
         }
-        eventSource = new EventSource(`/moti?channel=${activeChannel.uri}`);
 
-        eventSource.onmessage = (message) => {
+        channelSource = new EventSource(`/moti?channel=${activeChannel.uri}`);
+
+        channelSource.onmessage = (message) => {
             const {frequency, duration}: Note = JSON.parse(message.data)
             playNote(frequency, duration)
         };
 
-        eventSource.onerror = () => {
+        channelSource.onerror = () => {
             console.error('Error in EventSource connection');
-            eventSource?.close();
+            channelSource?.close();
         };
+    }
+
+    const stopChannel = () => {
+        channelSource?.close()
+        synth?.triggerRelease()
+        hasStarted = false
     }
 
     const playNote = (frequency: number, duration: number) => {
@@ -70,10 +84,11 @@
     }
 
     const setChannel = (channel: Channel) => {
-        console.log("setChannel", channel)
         activeChannel = channel
         audioMotion ? audioMotion.gradient = `${channel.label}-gradient` : undefined
-        return null
+        if(hasStarted){
+            startChannel()
+        }
     };
 
     onMount(() => {
@@ -109,7 +124,7 @@
     onDestroy(() => {
         audioMotion?.destroy();
         synth?.disconnect();
-        eventSource?.close();
+        channelSource?.close();
     });
 
 </script>
@@ -117,7 +132,7 @@
 <style>
     #audio-motion-container {
         border-radius: 25px;
-        background-color: #f7f7f7;
+        background-color: #212121;
     }
     .channel-card-img {
         height: 200px;
@@ -161,7 +176,7 @@
                 <button type="button"
                         disabled="{activeChannel === undefined}"
                         class="animate-fade-in {activeChannel.style.textColor} {activeChannel.style.backgroundColor} {activeChannel.style.backgroundColorHover} focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        on:click={start}>
+                        on:click={startChannel}>
                     Play
                     <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                          xmlns="http://www.w3.org/2000/svg"
@@ -175,7 +190,7 @@
                 <button type="button"
                         disabled="{activeChannel === undefined}"
                         class="animate-fade-in {activeChannel.style.textColor} {activeChannel.style.backgroundColor} {activeChannel.style.backgroundColorHover} focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        on:click={start}>
+                        on:click={stopChannel}>
                     Stop
                     <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true"
                          xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -204,7 +219,7 @@
                         {channel.description}
                     </p>
                     <button on:click={()=>setChannel(channel)}
-                            class="{`channel-${channel.style.class}`} {channel.style.textColor} {channel.style.backgroundColor} {channel.style.backgroundColorHover} {channel.style.backgroundColorHover}
+                            class="{`channel-${channel.style.class}`} {channel.style.textColor} {channel.style.backgroundColor} {channel.style.backgroundColorHover}
                              inline-flex items-center px-3 py-2 text-sm font-medium text-center rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:focus:ring-blue-800">
                         Listen
                         <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
