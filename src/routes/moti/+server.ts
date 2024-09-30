@@ -1,8 +1,18 @@
 import {ReadableStreamResponse} from "../../model/http/readable-stream-response";
+import type {RequestParamHandler} from "express";
+import type {RequestHandler} from "@sveltejs/kit";
 
 const encoder = new TextEncoder();
 
-export const GET = async () => {
+export const GET: RequestHandler = async ({request}) => {
+    const url = new URL(request.url); // Create a URL object
+    let interval: number
+    switch (url.searchParams.get("channel")) {
+        case "random-0":
+            interval = 1000; break;
+        case "random-1":
+            interval = 100; break;
+    }
     let intervalTimeout: NodeJS.Timeout;
 
     const stream = new ReadableStream({
@@ -14,7 +24,7 @@ export const GET = async () => {
                 const noteData: Note = {frequency, duration};
                 const data = `data: ${JSON.stringify(noteData)}\n\n`;
                 controller.enqueue(encoder.encode(data)); // Encode the string to Uint8Array
-            }, 2000);
+            }, interval);
 
         },
         close() {
@@ -26,5 +36,7 @@ export const GET = async () => {
         }
     });
 
-    return ReadableStreamResponse.of(stream);
+    return new Promise((resolve, reject) => {
+        resolve(ReadableStreamResponse.of(stream))
+    });
 };

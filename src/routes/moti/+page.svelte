@@ -11,6 +11,9 @@
             label: "Random",
             description: "Welcome to Random Tunes! Enjoy a continuous stream of random notes, perfect for any mood or moment.",
             img: rngImage,
+
+            uri: "random",
+
             style: {
                 class: "random",
                 backgroundColor: "bg-blue-100",
@@ -18,8 +21,11 @@
                 textColor: "text-black",
                 textColorColorHover: "text-black"
             },
-        }
-    )
+        },
+    ).map((item, index) => ({
+        ...item,
+        uri: `${item.uri}-${index}`
+    }))
     let activeChannel: Channel | undefined
 
     let synth: Tone.Synth | undefined
@@ -31,10 +37,22 @@
 
     const start = () => {
         hasStarted = true
-        eventSource ? eventSource.onmessage = (message) => {
+
+        eventSource?.close()
+        if(!activeChannel){
+            throw new Error("No active channel.")
+        }
+        eventSource = new EventSource(`/moti?channel=${activeChannel.uri}`);
+
+        eventSource.onmessage = (message) => {
             const {frequency, duration}: Note = JSON.parse(message.data)
             playNote(frequency, duration)
-        } : undefined;
+        };
+
+        eventSource.onerror = () => {
+            console.error('Error in EventSource connection');
+            eventSource?.close();
+        };
     }
 
     const playNote = (frequency: number, duration: number) => {
@@ -85,13 +103,6 @@
                 ]
             });
         })
-
-        eventSource = new EventSource('/moti');
-
-        eventSource.onerror = () => {
-            console.error('Error in EventSource connection');
-            eventSource?.close();
-        };
 
     });
 
