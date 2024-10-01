@@ -28,9 +28,7 @@ export namespace Extensions {
     ]
 
     export const randomTailwindBackgroundColor = () => {
-        console.log(randomColors.length)
         const sample = randomColors.sample();
-        console.log(sample)
         randomColors = randomColors.filter(item => item !== sample)
         return sample
     }
