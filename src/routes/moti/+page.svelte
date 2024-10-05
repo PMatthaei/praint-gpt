@@ -42,6 +42,8 @@
     let hasStarted = false;
     let channelSource: EventSource | undefined;
 
+    let errorMessage: string | undefined;
+
     const startChannel = () => {
         hasStarted = true
 
@@ -57,10 +59,16 @@
             playNote(frequency, duration)
         };
 
-        channelSource.onerror = () => {
-            console.error('Error in EventSource connection');
+        channelSource.onerror = (error: Event) => {
+            console.error(error);
             channelSource?.close();
         };
+
+        channelSource.addEventListener('connections', updateConnections);
+    }
+
+    const updateConnections = (event: Event) => {
+        console.log(event)
     }
 
     const stopChannel = () => {
@@ -147,6 +155,14 @@
 </svelte:head>
 
 <div class="flex flex-col gap-4 h-screen p-4 sm:ml-64">
+
+    <div class="absolute animate-fade-in z-10 rounded-lg min-w-80 bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+        <p class="font-bold">Channel not available</p>
+        <p>{ errorMessage ?? '' }</p>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
 
     <div id="audio-motion-container" class="animate-fade-in"></div>
 
