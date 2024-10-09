@@ -104,6 +104,63 @@
                     zoom: 18,
                 });
 
+                const popup = new maplibregl.Popup({
+                    closeButton: false,
+                    closeOnClick: false
+                });
+
+                map.on('load', function () {
+                    // Define a GeoJSON source with a point feature
+                    const pointFeature: any = {
+                        type: 'FeatureCollection',
+                        features: [
+                            {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'Point',
+                                    coordinates: [11.55683908213743, 48.126501246936016]
+                                },
+                                properties: {
+                                    title: 'My Point',
+                                    description: 'This is a point feature added to a custom layer.'
+                                }
+                            }
+                        ]
+                    };
+
+                    // Add the source for the point feature
+                    map.addSource('my-point-source', {
+                        type: 'geojson',
+                        data: pointFeature
+                    });
+
+                    // Add a custom layer to display the point
+                    map.addLayer({
+                        id: 'my-point-layer',
+                        type: 'circle',
+                        source: 'my-point-source',
+                        paint: {
+                            'circle-radius': 10,
+                            'circle-color': '#ff0000'
+                        }
+                    });
+
+                    // Optionally, add a click event listener to the point feature
+                    map.on('click', 'my-point-layer', function (e: any) {
+                        const properties = e.features[0].properties;
+                        alert(`You clicked on ${properties.title}: ${properties.description}`);
+                    });
+
+                    // Ensure the layer is visible
+                    map.on('mouseenter', 'my-point-layer', function () {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    map.on('mouseleave', 'my-point-layer', function () {
+                        map.getCanvas().style.cursor = '';
+                    });
+                });
+
                 const draw = new MapboxDraw({
                     displayControlsDefault: false,
                     controls: {
@@ -112,28 +169,11 @@
                 });
                 map.addControl(draw, 'top-left');
 
-                draw.add(getData());
-
                 map.on('draw.create', function (e) {
                     const coordinates = e.features[0].geometry.coordinates;
                     console.log("Point added at:", coordinates);
                 });
 
-                const popup = new maplibregl.Popup({
-                    closeButton: false,
-                    closeOnClick: false
-                });
-
-                map.on('click', (e: MapMouseEvent) => {
-                    console.log(e)
-                    map.getCanvas().style.cursor = 'pointer';
-                    popup.setLngLat(e.lngLat).setHTML("Test").addTo(map);
-                });
-
-                map.on('click', 'places', () => {
-                    map.getCanvas().style.cursor = '';
-                    popup.remove();
-                });
             }
         })
 
