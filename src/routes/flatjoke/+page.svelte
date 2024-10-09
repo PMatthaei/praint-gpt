@@ -2,8 +2,9 @@
 
     import {onDestroy, onMount} from "svelte";
     import {readable} from "svelte/store";
-    import maplibregl, {type StyleSpecification} from 'maplibre-gl';
+    import maplibregl, {type AddLayerObject, type MapGeoJSONFeature, type StyleSpecification} from 'maplibre-gl';
     import MapboxDraw, {type MapMouseEvent} from '@mapbox/mapbox-gl-draw';
+    import colors from 'tailwindcss/colors'
 
     let errorMessage: string | null = null;
     // Fix: https://github.com/maplibre/maplibre-gl-js/issues/2601
@@ -39,7 +40,7 @@
         ]
     };
 
-    const getData = (): any => {
+    const getData = () => {
         return {
             "type": "FeatureCollection",
             "features": [
@@ -47,7 +48,7 @@
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
-                        "coordinates": [11.55683908213743, 48.126501246936016] // Example coordinates
+                        "coordinates": [11.55683908213743, 48.126501246936016]
                     },
                     "properties": {}
                 },
@@ -55,7 +56,7 @@
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
-                        "coordinates": [11.55714217175614, 48.12639740694223] // Example coordinates
+                        "coordinates": [11.55714217175614, 48.12639740694223]
                     },
                     "properties": {}
                 }
@@ -96,85 +97,69 @@
 
     onMount(() => {
         location$.subscribe(result => {
-            if (result) {
-                const map = new maplibregl.Map({
-                    container: 'map',
-                    style: style,
-                    center: [result.coordinates.longitude, result.coordinates.latitude],
-                    zoom: 18,
-                });
+            const center = result ? [result.coordinates.longitude, result.coordinates.latitude] : [11.55683908213743, 48.126501246936016]
 
-                const popup = new maplibregl.Popup({
-                    closeButton: false,
-                    closeOnClick: false
-                });
+            const map = new maplibregl.Map({
+                container: 'map',
+                style: style,
+                center: center,
+                zoom: 18,
+            });
 
-                map.on('load', function () {
-                    // Define a GeoJSON source with a point feature
-                    const pointFeature: any = {
-                        type: 'FeatureCollection',
-                        features: [
-                            {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: [11.55683908213743, 48.126501246936016]
-                                },
-                                properties: {
-                                    title: 'My Point',
-                                    description: 'This is a point feature added to a custom layer.'
-                                }
-                            }
-                        ]
-                    };
+            const popup = new maplibregl.Popup({
+                closeButton: false,
+                closeOnClick: false
+            });
 
-                    // Add the source for the point feature
-                    map.addSource('my-point-source', {
-                        type: 'geojson',
-                        data: pointFeature
-                    });
-
-                    // Add a custom layer to display the point
-                    map.addLayer({
-                        id: 'my-point-layer',
-                        type: 'circle',
-                        source: 'my-point-source',
-                        paint: {
-                            'circle-radius': 10,
-                            'circle-color': '#ff0000'
-                        }
-                    });
-
-                    // Optionally, add a click event listener to the point feature
-                    map.on('click', 'my-point-layer', function (e: any) {
-                        const properties = e.features[0].properties;
-                        alert(`You clicked on ${properties.title}: ${properties.description}`);
-                    });
-
-                    // Ensure the layer is visible
-                    map.on('mouseenter', 'my-point-layer', function () {
-                        map.getCanvas().style.cursor = 'pointer';
-                    });
-
-                    map.on('mouseleave', 'my-point-layer', function () {
-                        map.getCanvas().style.cursor = '';
-                    });
-                });
-
-                const draw = new MapboxDraw({
-                    displayControlsDefault: false,
-                    controls: {
-                        point: true,
-                    },
-                });
-                map.addControl(draw, 'top-left');
-
-                map.on('draw.create', function (e) {
-                    const coordinates = e.features[0].geometry.coordinates;
-                    console.log("Point added at:", coordinates);
-                });
-
+            const layer: AddLayerObject = {
+                id: 'flat-jokes-layer',
+                type: 'circle',
+                source: 'flat-jokes-source',
+                paint: {
+                    'circle-radius': 10,
+                    'circle-color': colors.blue['500']
+                }
             }
+            map.on('load', function () {
+
+                // Add the source for the point feature
+                map.addSource('flat-jokes-source', {
+                    type: 'geojson',
+                    data: getData()
+                });
+
+                // Add a custom layer to display the point
+                map.addLayer(layer);
+
+                // Optionally, add a click event listener to the point feature
+                map.on('click', 'flat-jokes-layer', function (ev: MapMouseEvent & {
+                    features?: MapGeoJSONFeature[] | undefined;
+                } & Object) {
+                    popup.setLngLat(ev.lngLat).setHTML("Test").addTo(map);
+                });
+
+                map.on('mouseenter', 'flat-jokes-layer', function () {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+
+                map.on('mouseleave', 'flat-jokes-layer', function () {
+                    map.getCanvas().style.cursor = '';
+                });
+            });
+
+            const draw = new MapboxDraw({
+                displayControlsDefault: false,
+                controls: {
+                    point: true,
+                },
+            });
+            map.addControl(draw, 'top-left');
+
+            map.on('draw.create', function (e) {
+                const coordinates = e.features[0].geometry.coordinates;
+                console.log("Point added at:", coordinates);
+            });
+
         })
 
     });
